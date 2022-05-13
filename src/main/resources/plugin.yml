@@ -4,7 +4,11 @@ main: me.the_ktc.performance.Main
 api-version: 1.18
 load: STARTUP
 authors: [ The_KTC ]
-description: A plugin to stop chrome and firefox
+description: A plugin for my Minecraft-Server
 commands:
   performance:
     description: Ein Performance-modus!
+  roleplay:
+    description: Abhängig vom Input
+  ktc:
+    description: Healp!
