@@ -8,21 +8,11 @@ public class Performance implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (!player.hasPermission("performance")) {
-                if (args.length == 0) {
-                    DoClose();
-                    player.sendMessage("§aDer Performance-Modus ist nun aktiv!");
-                } else sender.sendMessage("Pls nur /performance verwenden");
-            } else {
-                if (args.length == 0) {
-                    player.sendMessage("§aDer Performance-Modus ist nun aktiv!");
-                }
-                else if (args[1].equalsIgnoreCase("performance")) DoClose();
-
-                else sender.sendMessage("Pls nur /performance verwenden");
-            }
-        } else sender.sendMessage("Dieser Command geht leider nur als Player");
-
+            if (!player.hasPermission("performance") && player.hasPermission("performance") && args.length == 0) {
+                DoClose();
+                player.sendMessage("§aDer Performance-Modus ist nun aktiv!");
+                } else sender.sendMessage("Error");
+            } else sender.sendMessage("Dieser Command geht leider nur als Player");
         return false;
     }
 
