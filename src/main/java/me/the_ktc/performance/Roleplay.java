@@ -1,4 +1,5 @@
 package me.the_ktc.performance;
+import org.bukkit.*;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,13 +15,18 @@ public class Roleplay implements CommandExecutor {
         for (World w : org.bukkit.Bukkit.getServer().getWorlds())
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                if (!player.hasPermission("roleplay")) {
+                if (!player.hasPermission("roleplay") || player.hasPermission("roleplay")) {
                     if (args.length == 0) {
                         player.sendMessage("Und was soll ich nun tun?");
                     }
                     //if (args.length == 1) {
                     else if (args[1].equalsIgnoreCase("weather")) {
-                        if (args[2].equalsIgnoreCase("rain")) if (args[3].equalsIgnoreCase("on")) w.setStorm(true);
+                        if (args[2].equalsIgnoreCase("rain"))
+                            if (args[3].equalsIgnoreCase("on")) {
+                                w.setStorm(true);
+                                //w.hasStorm(true);
+                                //org.bukkit.event.weather.ThunderChangeEvent
+                            }
                     } else if (args[2].equalsIgnoreCase("storm"))
                         if (args[3].equalsIgnoreCase("on")) w.setThundering(true);
 
