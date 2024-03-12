@@ -1,4 +1,4 @@
-package me.the_ktc.performance;
+package me.the_ktc.taskkill;
 
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;

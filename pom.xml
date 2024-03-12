@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.the_ktc</groupId>
-    <artifactId>Performance</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>Taskkill</artifactId>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>Performance</name>
+    <name>Taskkiller</name>
 
-    <description>A plugin to stop chrome and firefox</description>
+    <description>A plugin to kill defined tasks</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
