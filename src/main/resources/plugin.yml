@@ -1,14 +1,11 @@
-name: Performance
+name: Taskkill
 version: '${project.version}'
-main: me.the_ktc.performance.Main
-api-version: 1.18
+main: the_ktc.taskkill.Taskkill
+api-version: '1.20'
 load: STARTUP
 authors: [ The_KTC ]
-description: A plugin for my Minecraft-Server
+description: "A plugin to kill processes"
 commands:
-  performance:
-    description: Ein Performance-modus!
-  roleplay:
-    description: Abhängig vom Input
-  ktc:
-    description: Healp!
+  taskkill:
+    description: "Ein Performance-modus!"
+    usage: "§4Wrong usage: /taskkill <name of listed task to kill>"

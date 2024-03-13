@@ -1,0 +1,13 @@
+name: Taskkill
+version: '1.0-Snapshot'
+main: the_ktc.taskkill.Taskkill
+api-version: '1.20'
+load: STARTUP
+authors: [ The_KTC ]
+description: A plugin to kill processes
+commands:
+  taskkill:
+    description: Ein Performance-modus!
+    usage: /taskkill <name of listed task>
+  test:
+    description: Healp!
