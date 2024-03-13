@@ -1,0 +1,14 @@
+# This is the config-file where you can
+# give the tasks which should be closed
+# by the plugin. The notation is simple
+# just add a comma after a task, except
+# for the last one, like for example:
+
+#listedPrograms: {
+#                  Testprogram1,
+#                  Testprogram2
+#}
+
+listedPrograms: {
+
+}

@@ -4,10 +4,8 @@ main: the_ktc.taskkill.Taskkill
 api-version: '1.20'
 load: STARTUP
 authors: [ The_KTC ]
-description: A plugin to kill processes
+description: "A plugin to kill processes"
 commands:
   taskkill:
-    description: Ein Performance-modus!
-    usage: /taskkill <name of listed task>
-  test:
-    description: Healp!
+    description: "Ein Performance-modus!"
+    usage: "§4Wrong usage: /taskkill <name of listed task to kill>"

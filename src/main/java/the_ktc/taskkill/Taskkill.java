@@ -1,18 +1,31 @@
 package the_ktc.taskkill;
 
 import org.bukkit.command.*;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 public final class Taskkill extends JavaPlugin {
-final String prefix ="[Taskkill V1.0] ";
+    final String prefix ="[Taskkill V1.0] ";
+    private File configFile;
+    private FileConfiguration config;
     @Override
     public void onEnable() {
         try{
             Performance perf = new Performance();
-            Objects.requireNonNull(getCommand("taskkill")).setExecutor((CommandExecutor) perf);            //perf.testAusgabe("Test");
+            Objects.requireNonNull(getCommand("taskkill")).setExecutor((CommandExecutor) perf);
+
+            checkPluginFolder();
+            checkConfigFile();
+            List programs=getServices();
+
+            //perf.testAusgabe("Test");
         } catch(Exception e){
             print("Taskkiller-Error: ");
             e.printStackTrace();
@@ -30,7 +43,64 @@ final String prefix ="[Taskkill V1.0] ";
     public void print(String input){
         System.out.println(prefix +input);
     }
+
+
+
+
+
+
+
+
+
+    private void checkPluginFolder() {
+        // Überprüfe, ob der Plugin-Ordner existiert, wenn nicht, erstelle ihn
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+            getLogger().info("Plugin-Ordner erstellt");
+        }
+    }
+
+    private void checkConfigFile() {
+        // Überprüfe, ob die config.yml existiert, wenn nicht, erstelle sie
+        configFile = new File(getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            saveResource("config.yml", false);
+            getLogger().info("config.yml erstellt");
+        }
+        // Lade die Config-Datei
+        config = YamlConfiguration.loadConfiguration(configFile);
+    }
+
+    // Methode, um auf die Config-Datei zuzugreifen
+    public List<String> getServices() {
+        //List<> output=new List;
+        if (config.contains("listedPrograms")) {
+            // Hole die Liste der aufgelisteten Programme
+            List<String> aufgelisteteProgramme = config.getStringList("listedPrograms");
+
+            // Durchlaufe die Liste und gib die Programme aus
+            for (String programm : aufgelisteteProgramme) {
+                System.out.println(programm);
+            }
+        } else {
+            // Wenn der Schlüssel nicht vorhanden ist, gib eine Fehlermeldung aus
+            System.out.println("Der Schlüssel 'listedPrograms' fehlt in der Konfigurationsdatei.");
+        }
+        return null;
+    }
+
+    // Methode, um Änderungen in der Config-Datei zu speichern
+    public void saveConfig() {
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            getLogger().severe("Fehler beim Speichern der config.yml: " + e.getMessage());
+        }
+    }
 }
+
+
+
 
 
 
@@ -69,10 +139,10 @@ print("args:");
          */
 
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            print(sender.toString());
-            print(command.toString());
-            print(label);
-            print("args:");
+//            print(sender.toString());
+//            print(command.toString());
+//            print(label);
+//            print("args:");
             if(!label.equals("taskkill"))
                 throw new RuntimeException("Wrong Command - it must be taskkill!");
             if (sender instanceof Player) {
