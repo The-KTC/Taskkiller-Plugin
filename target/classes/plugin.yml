@@ -9,3 +9,9 @@ commands:
   taskkill:
     description: "Ein Performance-modus!"
     usage: "§4Wrong usage: /taskkill <name of listed task to kill>"
+    permission: "taskkill.use"
+    children:
+      '*':
+        description: "Kills the specified task"
+        usage: "/taskkill <taskname>"
+        permission: "taskkill.use"

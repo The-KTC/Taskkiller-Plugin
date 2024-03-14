@@ -4,11 +4,8 @@
 # just add a comma after a task, except
 # for the last one, like for example:
 
-#listedPrograms: {
-#                  Testprogram1,
-#                  Testprogram2
-#}
+# listedPrograms:
+#   - firefox.exe
+#   - nextcloud.exe
 
-listedPrograms: {
-
-}
+listedPrograms:

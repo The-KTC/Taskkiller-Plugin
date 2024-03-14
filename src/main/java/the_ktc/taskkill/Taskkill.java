@@ -6,32 +6,40 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public final class Taskkill extends JavaPlugin {
-    final String prefix ="[Taskkill V1.0] ";
+public class Taskkill extends JavaPlugin implements CommandExecutor {
+
+    final String prefix = "[Taskkill V1.0] ";
     private File configFile;
     private FileConfiguration config;
+    private List<String> tasks;
+
+
     @Override
     public void onEnable() {
-        try{
-            Performance perf = new Performance();
-            Objects.requireNonNull(getCommand("taskkill")).setExecutor((CommandExecutor) perf);
+        try {
+            Objects.requireNonNull(getCommand("taskkill")).setExecutor((CommandExecutor) this);
+            // Ob Ordner vorhanden ist
+            checkFolderOfPlugin();
+            // ob Config vorhanden ist
+            tasks=checkConfigFile();
+//            List<String> programs = getServices();
+            print("Performance Plugin geladen!");
+        } catch (Exception e) {
+            print("Taskkiller-Error: " + e);
+            String filename = "error.log";
 
-            checkPluginFolder();
-            checkConfigFile();
-            List programs=getServices();
-
-            //perf.testAusgabe("Test");
-        } catch(Exception e){
-            print("Taskkiller-Error: ");
-            e.printStackTrace();
-
+            try {
+                PrintStream fileStream = new PrintStream(new FileOutputStream(filename));
+                e.printStackTrace(fileStream);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
             }
-        print("Performance Plugin geladen!");
+        }
 
     }
 
@@ -40,39 +48,45 @@ public final class Taskkill extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public void print(String input){
-        System.out.println(prefix +input);
+    public void print(String input) {
+        System.out.println(prefix + input);
     }
 
 
-
-
-
-
-
-
-
-    private void checkPluginFolder() {
-        // Überprüfe, ob der Plugin-Ordner existiert, wenn nicht, erstelle ihn
+    // Überprüfe, ob der Plugin-Ordner existiert, wenn nicht, erstelle ihn
+    private void checkFolderOfPlugin() {
         if (!getDataFolder().exists()) {
-            getDataFolder().mkdirs();
-            getLogger().info("Plugin-Ordner erstellt");
+            if (getDataFolder().mkdirs())
+                print("Plugin-Ordner erstellt");
+            else print("Plugin-Ordner konnte nicht erstellt werden!");
         }
     }
 
-    private void checkConfigFile() {
-        // Überprüfe, ob die config.yml existiert, wenn nicht, erstelle sie
+
+    /**
+     * Überprüft, ob die Config vorhanden ist -> wenn nicht, wird diese generiert.
+     * Zusätzlich dazu werden die Programme der Config gespeichert.
+     */
+    private List<String> checkConfigFile() {
+        List<String> output=new ArrayList<>();
         configFile = new File(getDataFolder(), "config.yml");
         if (!configFile.exists()) {
             saveResource("config.yml", false);
-            getLogger().info("config.yml erstellt");
+            print("config.yml erstellt");
         }
         // Lade die Config-Datei
         config = YamlConfiguration.loadConfiguration(configFile);
+
+        // Überprüfe, ob der Schlüssel "listedPrograms" vorhanden ist
+        if (config.contains("listedPrograms")){
+            output = config.getStringList("listedPrograms");
+            print("Der output ist:"+output.toString());}
+        else print("The key \"listedPrograms\" is not in the config.yml!");
+        return output;
     }
 
     // Methode, um auf die Config-Datei zuzugreifen
-    public List<String> getServices() {
+  /*  public List<String> getServices() {
         //List<> output=new List;
         if (config.contains("listedPrograms")) {
             // Hole die Liste der aufgelisteten Programme
@@ -87,7 +101,7 @@ public final class Taskkill extends JavaPlugin {
             System.out.println("Der Schlüssel 'listedPrograms' fehlt in der Konfigurationsdatei.");
         }
         return null;
-    }
+    }*/
 
     // Methode, um Änderungen in der Config-Datei zu speichern
     public void saveConfig() {
@@ -97,21 +111,8 @@ public final class Taskkill extends JavaPlugin {
             getLogger().severe("Fehler beim Speichern der config.yml: " + e.getMessage());
         }
     }
-}
 
 
-
-
-
-
-
-
-
-
-
-    class Performance implements CommandExecutor {
-
-        private String programName = "Test-Program";
 
         /*
         Code:
@@ -138,43 +139,53 @@ print("args:");
 [16:08:32] [Server thread/INFO]: DoClose was executed
          */
 
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 //            print(sender.toString());
 //            print(command.toString());
 //            print(label);
 //            print("args:");
-            if(!label.equals("taskkill"))
-                throw new RuntimeException("Wrong Command - it must be taskkill!");
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                if (args.length == 0) {
-                    DoClose(programName);
-                    player.sendMessage("§4Wrong usage: /taskkill <name of listed task to kill>");
-                    return true;
-                }
-                if (args[0].equals("test")){
-                    player.sendMessage("§4YESSSSSS");
-                    return true;
-                }
-
-            } else sender.sendMessage("This command sadly just works as a player!");
-            return false;
-        }
-
-        private void DoClose(String name) {
-            try {
-                System.out.println("DoClose was executed");
-                //Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"tasklist |find /i \"chrome.exe\">NUL |Taskkill /IM chrome.exe /F & exit && exit\"");
-                //Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"tasklist |find /i \"firefox.exe\">NUL |Taskkill /IM firefox.exe /F & exit && exit\"");
-                //System.out.println("Firefox und Chrome wurden geschlossen");
-            } catch (Exception e) {
-                System.out.println("ERROR in Plugin Taskkill:");
-                e.printStackTrace();
+        if (!label.equals("taskkill"))
+            throw new RuntimeException("Wrong Command - it must be taskkill!");
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (args.length == 0) {
+                player.sendMessage("§4Wrong usage: /taskkill <name of listed task to kill>");
+                return true;
             }
-        }
 
-        void print(String a){
-            System.out.println(a);
+
+//            tasks=checkConfigFile();
+//            player.sendMessage("tasks="+tasks);
+//            player.sendMessage("args[0]="+args[0]);
+
+            if (tasks.isEmpty()){
+                player.sendMessage(args[0]+" is not in the config!");
+                return true;
+            }
+            if (args.length>1) return false;
+
+            if (tasks.contains(args[0])) {
+                DoClose(args[0]);
+                player.sendMessage("§4"+args[0]+" was killed");
+                return true;
+            }
+            player.sendMessage(args[0]+" is not in the config!");
+            player.sendMessage("These are the available tasks in the config: "+tasks);
+            return true;
+        } else sender.sendMessage("This command sadly just works as a player!");
+        return false;
+    }
+
+    private void DoClose(String name) {
+        try {
+            print("Kill Task was executed for task "+name);
+            Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"tasklist |find /i \""+name+"\">NUL |Taskkill /IM "+name+" /F & exit && exit\"");
+            //Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"tasklist |find /i \"firefox.exe\">NUL |Taskkill /IM firefox.exe /F & exit && exit\"");
+            //System.out.println("Firefox und Chrome wurden geschlossen");
+        } catch (Exception e) {
+            print("ERROR in Plugin Taskkill:");
+            e.printStackTrace();
         }
     }
 
+}
