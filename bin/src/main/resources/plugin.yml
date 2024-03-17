@@ -1,5 +1,5 @@
 name: Taskkill
-version: '1.1'
+version: '${project.version}'
 main: the_ktc.taskkill.Taskkill
 api-version: '1.20'
 load: STARTUP

@@ -1,0 +1,1 @@
+This is a Minecraft-Plugin I´ve worked on while I ran a Minecraft Server on a Windows Machine (Don´t do this if you can´t see a Linux Terminal!). You can simply write the Tasks which can be closed by the players and the duration when the task is going to be restarted.

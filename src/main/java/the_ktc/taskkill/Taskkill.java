@@ -1,6 +1,8 @@
 package the_ktc.taskkill;
 
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -13,7 +15,7 @@ import java.util.Objects;
 
 public class Taskkill extends JavaPlugin implements CommandExecutor {
 
-    final String prefix = "[Taskkill V1.0] ";
+    final String prefix = "[Taskkill V1.1] ";
     private File configFile;
     private FileConfiguration config;
     private List<String> tasks;
@@ -27,83 +29,26 @@ public class Taskkill extends JavaPlugin implements CommandExecutor {
             checkFolderOfPlugin();
             // ob Config vorhanden ist
             tasks=checkConfigFile();
-//            List<String> programs = getServices();
             print("Performance Plugin geladen!");
         } catch (Exception e) {
             print("Taskkiller-Error: " + e);
-            String filename = "error.log";
-
             try {
-                PrintStream fileStream = new PrintStream(new FileOutputStream(filename));
-                e.printStackTrace(fileStream);
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
+            	// logfile schreiben
+            	try (PrintWriter writer = new PrintWriter(new FileWriter(this.getFile().getPath()+"/log.txt", false))) {
+                    writer.println(e); // Füge den Fehler hinzu
+                    print(e.toString()); // Ausgabe zur Bestätigung
+                } catch (IOException e1) {
+                    print("Error while logging the error into logfile: " + e1.getMessage()); // Fehlerausgabe, falls ein Fehler beim Loggen auftritt
+                }
+            } catch (Exception ex) {
+                print(ex.toString());
             }
         }
 
     }
-
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
-
-    public void print(String input) {
-        System.out.println(prefix + input);
-    }
-
-
-    // Überprüfe, ob der Plugin-Ordner existiert, wenn nicht, erstelle ihn
-    private void checkFolderOfPlugin() {
-        if (!getDataFolder().exists()) {
-            if (getDataFolder().mkdirs())
-                print("Plugin-Ordner erstellt");
-            else print("Plugin-Ordner konnte nicht erstellt werden!");
-        }
-    }
-
-
-    /**
-     * Überprüft, ob die Config vorhanden ist -> wenn nicht, wird diese generiert.
-     * Zusätzlich dazu werden die Programme der Config gespeichert.
-     */
-    private List<String> checkConfigFile() {
-        List<String> output=new ArrayList<>();
-        configFile = new File(getDataFolder(), "config.yml");
-        if (!configFile.exists()) {
-            saveResource("config.yml", false);
-            print("config.yml erstellt");
-        }
-        // Lade die Config-Datei
-        config = YamlConfiguration.loadConfiguration(configFile);
-
-        // Überprüfe, ob der Schlüssel "listedPrograms" vorhanden ist
-        if (config.contains("listedPrograms")){
-            output = config.getStringList("listedPrograms");
-            print("Der output ist:"+output.toString());}
-        else print("The key \"listedPrograms\" is not in the config.yml!");
-        return output;
-    }
-
-    // Methode, um auf die Config-Datei zuzugreifen
-  /*  public List<String> getServices() {
-        //List<> output=new List;
-        if (config.contains("listedPrograms")) {
-            // Hole die Liste der aufgelisteten Programme
-            List<String> aufgelisteteProgramme = config.getStringList("listedPrograms");
-
-            // Durchlaufe die Liste und gib die Programme aus
-            for (String programm : aufgelisteteProgramme) {
-                System.out.println(programm);
-            }
-        } else {
-            // Wenn der Schlüssel nicht vorhanden ist, gib eine Fehlermeldung aus
-            System.out.println("Der Schlüssel 'listedPrograms' fehlt in der Konfigurationsdatei.");
-        }
-        return null;
-    }*/
-
+        
     // Methode, um Änderungen in der Config-Datei zu speichern
+    @Override
     public void saveConfig() {
         try {
             config.save(configFile);
@@ -139,6 +84,11 @@ print("args:");
 [16:08:32] [Server thread/INFO]: DoClose was executed
          */
 
+    
+    /*
+     * Diese Methode behandelt die Command-Eingabe vom Spieler
+     */
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 //            print(sender.toString());
 //            print(command.toString());
@@ -152,18 +102,22 @@ print("args:");
                 player.sendMessage("§4Wrong usage: /taskkill <name of listed task to kill>");
                 return true;
             }
-
-
-//            tasks=checkConfigFile();
-//            player.sendMessage("tasks="+tasks);
-//            player.sendMessage("args[0]="+args[0]);
-
+//            if (args[0].equals("writeLog") && args.length>2) {
+//            	writeLog(args[1]);
+//            	player.sendMessage("Log written");
+//            	return true;
+//            }
+            if (args.length>1) return false;
+            if (args[0].equals("reload")) {
+            	checkFolderOfPlugin();
+                tasks=checkConfigFile();
+            	player.sendMessage("Taskkiller reloaded!");
+            	return true;
+            }
             if (tasks.isEmpty()){
                 player.sendMessage(args[0]+" is not in the config!");
                 return true;
             }
-            if (args.length>1) return false;
-
             if (tasks.contains(args[0])) {
                 DoClose(args[0]);
                 player.sendMessage("§4"+args[0]+" was killed");
@@ -175,6 +129,61 @@ print("args:");
         } else sender.sendMessage("This command sadly just works as a player!");
         return false;
     }
+    
+    public void print(String input) {
+        System.out.println(prefix + input);
+    }
+
+    
+    public void writeLog(String errorMessage) {
+        String filePath = getDataFolder().toPath() + "/log.txt";
+        
+        // Versuche, die Datei zu öffnen und den Fehler hinzuzufügen
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, false))) {
+            writer.println(errorMessage); // Füge den Fehler hinzu
+            print("Error logged successfully."); // Ausgabe zur Bestätigung
+        } catch (IOException e) {
+            print("Error logging: " + e.getMessage()); // Fehlerausgabe, falls ein Fehler beim Loggen auftritt
+        }
+    }
+    
+    
+    
+    // Überprüfe, ob der Plugin-Ordner existiert, wenn nicht, erstelle ihn
+    private void checkFolderOfPlugin() {
+        if (!getDataFolder().exists()) {
+            if (getDataFolder().mkdirs())
+                print("Plugin-Ordner erstellt");
+            else print("Plugin-Ordner konnte nicht erstellt werden!");
+        }
+    }
+
+
+    /**
+     * Überprüft, ob die Config vorhanden ist -> wenn nicht, wird diese generiert.
+     * Zusätzlich dazu werden die Programme der Config gespeichert.
+     */
+    private List<String> checkConfigFile() {
+        List<String> output=new ArrayList<>();
+        configFile = new File(getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            saveResource("config.yml", false);
+            print("config.yml erstellt");
+        }
+        // Lade die Config-Datei
+        config = YamlConfiguration.loadConfiguration(configFile);
+
+        // Überprüfe, ob der Schlüssel "listedPrograms" vorhanden ist
+        if (config.contains("listedPrograms")){
+            output = config.getStringList("listedPrograms");
+            print("Der output ist:"+output.toString());}
+        else print("The key \"listedPrograms\" is not in the config.yml!");
+        return output;
+    }
+
+
+
+
 
     private void DoClose(String name) {
         try {

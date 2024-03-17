@@ -6,7 +6,7 @@
 
   <groupId>The_KTC</groupId>
   <artifactId>Taskkill</artifactId>
-  <version>1.1</version>
+  <version>1.0-Snapshot</version>
   <packaging>jar</packaging>
 
   <name>Taskkill</name>
@@ -59,13 +59,13 @@
           <url>https://oss.sonatype.org/content/groups/public/</url>
       </repository>
   </repositories>
-  <dependencies>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.20.1-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
 
+  <dependencies>
+      <dependency>
+          <groupId>org.spigotmc</groupId>
+          <artifactId>spigot-api</artifactId>
+          <version>1.20.1-R0.1-SNAPSHOT</version>
+          <scope>provided</scope>
+      </dependency>
+  </dependencies>
 </project>
